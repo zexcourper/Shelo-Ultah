@@ -1,0 +1,193 @@
+<!doctype html>
+
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Selamat Ulang Tahun, Shelomita!</title>
+  <style>
+    :root{
+      --bg1:#fff7fb;
+      --bg2:#fff1f8;
+      --accent:#ff6fa3;
+      --accent-2:#ffb3d6;
+      --muted:#6b6b6b;
+      --card:#ffffff;
+      --radius:16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#222}
+    .wrap{max-width:980px;margin:32px auto;padding:20px}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:28px}
+    header{display:flex;gap:18px;align-items:center}
+    .logo-circle{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:22px}
+    h1{margin:0;font-size:26px}
+    p.lead{color:var(--muted);margin:6px 0 18px}
+    .hero{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+    .message{padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.75));}
+    .message h2{margin:0 0 8px;color:var(--accent)}
+    .bigwish{font-size:20px;margin:0 0 12px}
+    .photo{border-radius:12px;overflow:hidden;height:260px;background:linear-gradient(180deg,#ffdfe9,#fff);display:flex;align-items:center;justify-content:center}
+    .photo img{width:100%;height:100%;object-fit:cover}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    button{background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+    button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,111,163,0.18)}
+    .notes{margin-top:14px;color:#444;font-size:14px}
+    .gallery{display:flex;gap:8px;margin-top:12px}
+    .gallery img{width:84px;height:84px;border-radius:10px;object-fit:cover}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    /* responsive */
+    @media (max-width:880px){
+      .hero{grid-template-columns:1fr;}
+      .photo{height:200px}
+    }
+    /* small confetti canvas overlay */
+    canvas#confetti{position:fixed;left:0;top:0;pointer-events:none;z-index:9999}
+    /* simple balloon animation */
+    .balloon{position:absolute;right:24px;top:24px;opacity:0.9}
+    .badge{display:inline-block;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;font-weight:700}
+    input[type=file]{display:none}
+    .share{display:flex;gap:8px;align-items:center}
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo-circle">SPP</div>
+        <div>
+          <h1>Selamat ulang tahun, Shelomita Pratiwi Putri</h1>
+          <p class="lead">Situs kecil ini dibuat khusus buat kamu, cewek keren yang wajib dirayain hari ini.</p>
+        </div>
+      </header><main class="hero" style="position:relative;margin-top:18px">
+    <section class="message">
+      <h2>Hai Shelomita, happy birthday</h2>
+      <p class="bigwish">Semoga hari ini penuh tawa, kopi enak, dan kejutan manis. Jangan lupa, kamu berharga, kamu pantes bahagia.</p>
+      <div class="notes">Biar makin personal, tulis pesanmu di bawah, lalu klik Kirim. Pesan ini bakal tampil di kartu ucapan.</div>
+
+      <div style="margin-top:12px">
+        <textarea id="userMsg" rows="4" placeholder="Tulis pesan singkatmu untuk Shelomita, misal: " style="width:100%;padding:12px;border-radius:10px;border:1px solid #eee;font-size:15px;resize:vertical"></textarea>
+        <div class="controls">
+          <button id="sendBtn">Kirim dan Tampilkan</button>
+          <button class="ghost" id="confettiBtn">Nyalain Konfeti</button>
+          <label class="ghost" for="imgUpload" style="padding:10px 14px;display:inline-block;cursor:pointer">Ganti Foto</label>
+          <input id="imgUpload" type="file" accept="image/*" />
+          <button id="downloadBtn" class="ghost">Simpan Pesan</button>
+        </div>
+      </div>
+
+      <div id="cardArea" style="margin-top:14px;padding:12px;border-radius:10px;background:#fff7fb;display:none">
+        <strong>Kartu ucapan</strong>
+        <p id="cardText" style="margin:8px 0 0;color:#333"></p>
+      </div>
+
+      <div class="gallery" id="thumbs"></div>
+    </section>
+
+    <aside style="position:relative">
+      <div class="photo" id="photoBox">
+        <img id="mainPhoto" src="https://images.unsplash.com/photo-1519340241926-0b0a1f2a1d7f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Foto Shelomita">
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <div class="badge">21</div>
+        <div style="flex:1">
+          <div style="font-weight:700">Shelomita Pratiwi Putri</div>
+          <div style="color:var(--muted);font-size:13px">Selamat ulang tahun, semoga berlimpah berkah</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button id="shareBtn">Share</button>
+        <button class="ghost" id="printBtn">Print</button>
+      </div>
+    </aside>
+
+  </main>
+
+  <footer>
+    Buat oleh kamu, bisa diedit. Kalo mau minta versi PDF atau PowerPoint, bilang aja.
+  </footer>
+</div>
+
+  </div>  <script>
+    // confetti canvas simple
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+    function rand(min,max){return Math.random()*(max-min)+min}
+    function Confetti(){
+      this.x = rand(0,W);
+      this.y = rand(-H,0);
+      this.vx = rand(-1,1);
+      this.vy = rand(2,6);
+      this.size = Math.floor(rand(6,12));
+      this.color = ['#ff6fa3','#ff9fcf','#ffd1e9','#ffc2d6'][Math.floor(Math.random()*4)];
+      this.draw = function(){
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x,this.y,this.size,this.size*0.6);
+      }
+    }
+    let confs = [];
+    function startConfetti(){
+      confs = [];
+      for(let i=0;i<180;i++) confs.push(new Confetti());
+      runConfetti = true; animate();
+      setTimeout(()=>{runConfetti=false;},4000);
+    }
+    let runConfetti = false;
+    function animate(){
+      if(!runConfetti) return ctx.clearRect(0,0,W,H);
+      ctx.clearRect(0,0,W,H);
+      confs.forEach(c=>{c.x += c.vx; c.y += c.vy; c.vy += 0.02; c.draw()});
+      confs = confs.filter(c=>c.y < H+50);
+      requestAnimationFrame(animate);
+    }
+
+    document.getElementById('confettiBtn').addEventListener('click', ()=>{startConfetti()});
+
+    // send message
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.addEventListener('click', ()=>{
+      const txt = document.getElementById('userMsg').value.trim();
+      if(!txt) return alert('Tulis dulu pesannya, bro.');
+      document.getElementById('cardText').textContent = txt;
+      document.getElementById('cardArea').style.display = 'block';
+      startConfetti();
+    });
+
+    // image upload preview
+    const imgInput = document.getElementById('imgUpload');
+    imgInput.addEventListener('change', e=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const url = URL.createObjectURL(f);
+      document.getElementById('mainPhoto').src = url;
+      const thumbs = document.getElementById('thumbs');
+      const img = document.createElement('img'); img.src = url; thumbs.appendChild(img);
+    });
+
+    // download message
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+      const txt = document.getElementById('userMsg').value.trim();
+      const blob = new Blob([txt || 'Selamat ulang tahun, Shelomita!'],{type:'text/plain'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'pesan-shelomita.txt'; a.click();
+    });
+
+    // share and print
+    document.getElementById('printBtn').addEventListener('click', ()=>{window.print()});
+    document.getElementById('shareBtn').addEventListener('click', ()=>{
+      if(navigator.share){
+        navigator.share({title:'Selamat ulang tahun Shelomita',text:document.getElementById('userMsg').value || 'Selamat ulang tahun, Shelomita!',url:location.href}).catch(()=>{});
+      } else {
+        prompt('Salin link ini, kirim ke yang lain',location.href);
+      }
+    });
+
+    // resize canvas
+    window.addEventListener('resize', ()=>{W=window.innerWidth;H=window.innerHeight;canvas.width=W;canvas.height=H});
+  </script></body>
+</html>
